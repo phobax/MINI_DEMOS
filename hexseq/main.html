@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<head>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="./main.js"></script>
+  <script type="module" src="/engine/audio.js"></script>
+  <link href="style.css" rel="stylesheet"/>
+</head>
+
+<html>
+<iframe src="./templates.html" id="templates" style="display:none;"></iframe>
+  <body>
+    <button onclick="start()"></button>
+    <div id="track_container0"></div>
+    <div id="track_container1"></div>
+    <div id="numkeys_container"></div>
+    <div id="xx" class="numkey" onclick="STATE.CURRENT_TRACK=(STATE.CURRENT_TRACK+1)%2"></div>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "depth-feed-browser",
+  "version": "0.0.30",
+  "description": "display depth feed in browser",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./src/index.js"
+  },
+  "author": "Wouter Verweirder <wouter.verweirder@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.9.8",
+    "socket.io": "~1.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
+}

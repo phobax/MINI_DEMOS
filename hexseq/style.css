@@ -1,0 +1,50 @@
+.step {
+  width:40px;
+  height:40px;
+  background-color: rgb(100,40,0);
+  margin-bottom: 10px;
+}
+
+
+.on {
+  background-color: rgb(255,120,0);
+}
+
+.set {
+  background-color: rgb(100,0,200)
+}
+
+
+#numkeys_container {
+  position: absolute;
+  left: 400px;
+  top: 200px;
+}
+
+#track_container0 {
+  position: absolute;
+  top:50px;
+  left:50px;
+}
+
+#track_container1 {
+  position: absolute;
+  top:50px;
+  left:250px;
+}
+
+.numkey {
+  width:30px;
+  height:30px;
+  background-color: rgb(130,140,140);
+  font-size: 18pt;
+  padding-left: 10px;
+  padding-top: 10px;
+  margin-top: 4px;
+  font-family: monospace;
+}
+
+.segment_display {
+  font-size: 14pt;
+  font-family: monospace;
+}

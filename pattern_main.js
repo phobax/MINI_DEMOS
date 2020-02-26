@@ -12,7 +12,6 @@ import {createProgram, loadImages} from "/utility.js";
 
       var uniformMvpLocation;
       var uniformTexture0Location;
-      var uniformTexture1Location;
       var uniformLodBiasLocation;
       var uniformTimeLocation;
 
@@ -24,11 +23,13 @@ import {createProgram, loadImages} from "/utility.js";
       var mesh1;
 
 
-
+      function rnd(n) {
+        return Math.round(Math.random()*n);
+      }
 
       function render() {
         _render();
-        requestAnimationFrame(render);
+        //requestAnimationFrame(render);
       }
 
       window.onload  = ()=>{
@@ -38,27 +39,40 @@ import {createProgram, loadImages} from "/utility.js";
         program = createProgram (gl, v_shader_tex, f_shader_tex);
         uniformMvpLocation      = gl.getUniformLocation (program, "mvp");
         uniformTexture0Location = gl.getUniformLocation (program, "texture0");
-        uniformTexture1Location = gl.getUniformLocation (program, "texture1");
         uniformLodBiasLocation  = gl.getUniformLocation (program, "lodBias");
         uniformTimeLocation     = gl.getUniformLocation (program, "uTime");
 
         mesh1 = new TriangleMesh(gl);
-        mesh1.addVertex (new Vertex({pos:{x:-1, y:-1, z:0}, texcoord:{x:0,y:0}, color:{r:1.0, g:1.0, b:1.0}, cl:[Math.random(),Math.random()]}));
-        mesh1.addVertex (new Vertex({pos:{x:1, y:-1, z:0}, texcoord:{x:1,y:0}, color:{r:1.0, g:0.4, b:1.0}, cl:[Math.random(),Math.random()]}));
-        mesh1.addVertex (new Vertex({pos:{x:1, y:1, z:0}, texcoord:{x:1,y:1}, color:{r:1.0, g:1.0, b:1.0}, cl:[Math.random(),Math.random()]}));
-        // this.mesh1.addVertex (new Vertex({pos:{x:0, y:1, z:0}, texcoord:{x:0,y:1}, color:{r:1.0, g:1.0, b:1.0}}));
-        mesh1.init()
+
+        mesh1.init ((i)=>{
+
+          var attribs = [{},{},{}];
+
+          var cl = rnd(1);
+          var center = [Math.random()*2-1, Math.random()*2-1, 0];
+
+          for (var j=0; j<3; j++) {
+            var dx = (j<1)*0.1;
+            var dy = Math.floor(j/2)*0.1;
+            attribs[j]["pos"] = [center[0]+dx, center[1]+dy, center[2], 0.4];
+            attribs[j]["texcoord"] = [dx*15,dy*15];
+            attribs[j]["color"] = [1,0,0];
+            attribs[j]["cl"] = [cl,0];
+          }
+          return attribs;
+        },2);
 
         loadImages ('/Di-3d.png')
         .then(images=>{
           gl.pixelStorei (gl.UNPACK_ALIGNMENT, 1);
           texture0 = new Texture (gl, images[0]);
+          render();
         })
         .catch(err=>{
           
         })
 
-        render();
+        
       }
 
       
@@ -87,9 +101,8 @@ import {createProgram, loadImages} from "/utility.js";
           gl.deleteBuffer(vertexPosBuffer);
           gl.deleteBuffer(vertexTexBuffer);
           
-          for (var j=0; j<textures.length; ++j) {
-            gl.deleteTexture(textures[j]);
-          }
+          gl.deleteTexture(texture0);
+          
           gl.deleteVertexArray(vertexArray);
           gl.deleteProgram(program);
         }
@@ -116,7 +129,6 @@ import {createProgram, loadImages} from "/utility.js";
 
           gl.uniformMatrix4fv (uniformMvpLocation, false, matrix);
           gl.uniform1i (uniformTexture0Location, 0);
-          gl.uniform1i (uniformTexture1Location, 1);
           gl.uniform1f (uniformTimeLocation, time);
           time += 0.01;
 
@@ -146,8 +158,7 @@ import {createProgram, loadImages} from "/utility.js";
 
 /*
           this.mesh0 = new LineMesh (this.gl);
-          
-
+        
           // for (var i=0; i<10000; i++) {
           //   var x = Math.random()*2-1;
           //   var y = Math.random()*2-1;
@@ -159,9 +170,6 @@ import {createProgram, loadImages} from "/utility.js";
           this.mesh0.populate ((i)=>{
 
           },100);
-
-
-          
 
           this.viewport = new Array(Corners.MAX);
 

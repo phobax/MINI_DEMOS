@@ -25,32 +25,62 @@ class Mesh {
         this.vertices.push(v);
       }
 
-      populate (f, N) {
-        
-      }
-      init () {
 
-        for (var i=0; i<this.N; i++) {
-          this.vertices.push(new Vertex())
+      init (generateFunction=null, N=0) {
+
+        if (generateFunction) {
+          for (var i=0; i<N; i++) {
+            var verticesAttributes = generateFunction(i);
+            for (var vertexAttributes of verticesAttributes) {
+              this.vertices.push(new Vertex(vertexAttributes));
+              this.N += 1;
+            }
+          }
         }
 
+
+        
+
         var _data = {};
+        var _sizes = {};
         // default attributes
         for (var v of this.vertices) {
-          this.posData.push(v.pos.x, v.pos.y);
-          this.texcoordData.push(v.texcoord.x, v.texcoord.y);
-          this.colorData.push(v.color.r, v.color.g, v.color.b);
+          
+          if ("x" in v.pos) {
+            this.posData.push(v.pos.x, v.pos.y, v.pos.z);
+          }
+          else {
+            this.posData.push(v.pos[0], v.pos[1], v.pos[3]);
+          }
+          if ("x" in v.pos) {
+            this.texcoordData.push(v.texcoord.x, v.texcoord.y);
+          }
+          else {
+            this.texcoordData.push(v.texcoord[0], v.texcoord[1]);
+          }
+          if ("r" in v.color) {
+            this.colorData.push(v.color.r, v.color.g, v.color.b);
+          }
+          else {
+            this.colorData.push(v[0]);
+            this.colorData.push(v[1]);
+            this.colorData.push(v[2]);
+          }
 
           for (var key of Object.keys(v)) {
             if (key == "pos") continue;
             if (key == "color") continue;
             if (key == "texcoord") continue;
             if (!(key in _data)) _data[key] = [];
-            for (var v of v[key]) {
-              _data[key].push(v);
+            if (!(key in _sizes)) _sizes[key] = 0;
+            for (var _v of v[key]) {
+              _data[key].push(_v);
             }
+            _sizes[key] = v[key].length;
           }
         }
+
+
 
 
           this.len = this.vertices.length;
@@ -84,34 +114,36 @@ class Mesh {
           this.gl.enableVertexAttribArray (this.vertexPosLocation);
           this.gl.bindBuffer (this.gl.ARRAY_BUFFER, null);
 
-          this.vertexTexLocation = 4; // set with GLSL layout qualifier
+          this.vertexTexLocation = 1; // set with GLSL layout qualifier
           this.gl.bindBuffer (this.gl.ARRAY_BUFFER, this.vertexTexBuffer);
           this.gl.vertexAttribPointer (this.vertexTexLocation, 2, this.gl.FLOAT, false, 0, 0);
           this.gl.enableVertexAttribArray (this.vertexTexLocation);
           this.gl.bindBuffer (this.gl.ARRAY_BUFFER, null);
 
-          this.vertexColorLocation = 8; // set with GLSL layout qualifier
+          this.vertexColorLocation = 2; // set with GLSL layout qualifier
           this.gl.bindBuffer (this.gl.ARRAY_BUFFER, this.vertexColorBuffer);
           this.gl.vertexAttribPointer (this.vertexColorLocation, 3, this.gl.FLOAT, false, 0, 0);
           this.gl.enableVertexAttribArray (this.vertexColorLocation);
           this.gl.bindBuffer (this.gl.ARRAY_BUFFER, null);
 
-          this.buf = this.gl.createBuffer();
-          this.gl.bindBuffer (this.gl.ARRAY_BUFFER, this.buf);
-          var datLocation = 14; // set with GLSL layout qualifier
-
+          this.datLocation = 14;
           for (var key of Object.keys(_data)) {
+
             var arrayData = new Float32Array(_data[key]);
-            this.gl.vertexAttribPointer (datLocation, 2, this.gl.FLOAT, false, 0, 0);
+            var buf = this.gl.createBuffer();
+            this.gl.bindBuffer (this.gl.ARRAY_BUFFER, buf);
             this.gl.bufferData (this.gl.ARRAY_BUFFER, arrayData, this.gl.STATIC_DRAW);  
+            this.gl.bindBuffer (this.gl.ARRAY_BUFFER, null);
+
+            this.gl.bindBuffer (this.gl.ARRAY_BUFFER, buf);
+            this.gl.vertexAttribPointer (this.datLocation, _sizes[key], this.gl.FLOAT, false, 0, 0);
+            this.gl.enableVertexAttribArray (this.datLocation);
+            this.gl.bindBuffer (this.gl.ARRAY_BUFFER, null);
+
+            this.datLocation += _sizes[key]*2;
           }
+
           this.gl.bindBuffer (this.gl.ARRAY_BUFFER, null);
-
-          
-
-          
-          
-
           this.gl.bindVertexArray(null);
         }
 
